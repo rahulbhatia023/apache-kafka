@@ -11,24 +11,27 @@ import java.util.Properties;
 
 public class SimpleConsumer {
     public static void main(String[] args) {
-        String topic = "test"; // The topic 'test' is already created using create command
+        String topicName = "test"; // The topic 'test' is already created using create command
 
-        Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, topic);
+        Properties configProperties = new Properties();
+        configProperties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        configProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+        configProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+        configProperties.put(ConsumerConfig.GROUP_ID_CONFIG, "test");
 
-        KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<String, String>(props);
-        kafkaConsumer.subscribe(Collections.singletonList(topic));
+        KafkaConsumer<String, String> kafkaConsumer = new KafkaConsumer<>(configProperties);
+        kafkaConsumer.subscribe(Collections.singletonList(topicName));
 
-        System.out.println("Subscribed to topic: " + topic);
-
-        while (true) {
-            ConsumerRecords<String, String> consumerRecords = kafkaConsumer.poll(Duration.ofSeconds(10));
-            for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
-                System.out.println(consumerRecord.value());
+        try {
+            while (true) {
+                ConsumerRecords<String, String> consumerRecords = kafkaConsumer.poll(Duration.ofSeconds(10));
+                for (ConsumerRecord<String, String> consumerRecord : consumerRecords)
+                    System.out.println(consumerRecord.value());
             }
+        } catch (Exception e) {
+            System.out.println("Exception caught: " + e.getMessage());
+        } finally {
+            kafkaConsumer.close();
         }
     }
 }

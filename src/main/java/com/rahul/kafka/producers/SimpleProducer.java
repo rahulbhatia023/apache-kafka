@@ -8,17 +8,17 @@ import java.util.Properties;
 
 public class SimpleProducer {
     public static void main(String[] args) {
-        String topic = "test"; // The topic 'test' is already created using create command
+        String topicName = "test"; // The topic 'test' is already created using create command
 
-        Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+        Properties configProperties = new Properties();
+        configProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        configProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+        configProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
 
-        KafkaProducer<String, String> kafkaProducer = new KafkaProducer<String, String>(props);
+        KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(configProperties);
 
         for (int i = 1; i <= 10; i++) {
-            ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>(topic, Integer.toString(i), Integer.toString(i));
+            ProducerRecord<String, String> producerRecord = new ProducerRecord<>(topicName, Integer.toString(i), Integer.toString(i));
             kafkaProducer.send(producerRecord);
         }
 

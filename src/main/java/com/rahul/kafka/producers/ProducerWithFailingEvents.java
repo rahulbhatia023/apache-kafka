@@ -26,8 +26,10 @@ public class ProducerWithFailingEvents {
             }
             count++;
         }
+        invalidKafkaProducer.close();
 
         KafkaProducer<String, String> validKafkaProducer = KafkaUtils.getKafkaProducer("kafka-producer-configs-valid.properties");
         KafkaUtils.publishFailedRecords(validKafkaProducer);
+        validKafkaProducer.close();
     }
 }

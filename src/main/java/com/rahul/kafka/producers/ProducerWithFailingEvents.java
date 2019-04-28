@@ -4,12 +4,13 @@ import com.rahul.kafka.IKafkaConstants;
 import com.rahul.kafka.utils.KafkaUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 
 import java.io.IOException;
 
 public class ProducerWithFailingEvents {
     public static void main(String[] args) throws IOException {
-        KafkaProducer<String, String> invalidKafkaProducer = KafkaUtils.getKafkaProducer("kafka-producer-configs-invalid.properties");
+        KafkaProducer<String, String> invalidKafkaProducer = KafkaUtils.getKafkaProducer("kafka-producer-configs-valid.properties");
 
         int count = 1;
         while (count <= 10) {
@@ -17,7 +18,8 @@ public class ProducerWithFailingEvents {
                     Integer.toString(count), Integer.toString(count));
             try {
                 System.out.println("Sending Record: " + producerRecord.toString());
-                invalidKafkaProducer.send(producerRecord).get();
+                RecordMetadata recordMetadata = invalidKafkaProducer.send(producerRecord).get();
+                System.out.println("Record is sent to partition number : " + recordMetadata.partition() + " and offset: " + recordMetadata.offset());
             } catch (Exception e) {
                 System.out.println("Error in sending the message: " + producerRecord.value());
                 System.out.println(e.getMessage());

@@ -22,7 +22,6 @@ public class AsynchronousProducer {
 }
 
 class MyProducerCallback implements Callback {
-
     @Override
     public void onCompletion(RecordMetadata recordMetadata, Exception e) {
         if (e != null)

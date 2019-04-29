@@ -19,6 +19,8 @@ public class Producer {
 
         for (int i = 1; i <= 10; i++) {
             ProducerRecord<String, String> producerRecord = new ProducerRecord<>(IKafkaConstants.TOPIC_NAME, Integer.toString(i), Integer.toString(i));
+
+            // Fire and Forget Approach: Refer important-notes.txt file
             kafkaProducer.send(producerRecord);
         }
 

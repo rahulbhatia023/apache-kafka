@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class ProducerWithFailingEvents {
     public static void main(String[] args) throws IOException {
-        KafkaProducer<String, String> invalidKafkaProducer = KafkaUtils.getKafkaProducer("kafka-producer-configs-valid.properties");
+        KafkaProducer<String, String> invalidKafkaProducer = KafkaUtils.getKafkaProducer("kafka-producer-configs-invalid.properties");
 
         int count = 1;
         while (count <= 10) {
@@ -18,7 +18,10 @@ public class ProducerWithFailingEvents {
                     Integer.toString(count), Integer.toString(count));
             try {
                 System.out.println("Sending Record: " + producerRecord.toString());
+
+                // Synchronous Producer: Refer important-notes.txt file
                 RecordMetadata recordMetadata = invalidKafkaProducer.send(producerRecord).get();
+
                 System.out.println("Record is sent to partition number : " + recordMetadata.partition() + " and offset: " + recordMetadata.offset());
             } catch (Exception e) {
                 System.out.println("Error in sending the message: " + producerRecord.value());

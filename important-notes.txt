@@ -1,0 +1,48 @@
+Approaches to send a message to kafka
+=====================================
+
+Fire-and-forget Producer
+------------------------
+Send and forget is the simplest approach. In this method, we send a message to the broker and don’t care if it was successfully received or not.
+You might be wondering that is this a right approach? Where to use that method?
+Well, Kafka is a distributed system. It comes with inbuilt fault tolerance feature. That makes Kafka a highly available system.
+So most of the time, your message will reach to the broker. We also know that producer will automatically retry in case of recoverable error.
+So, the probability of losing your messages is thin.
+There are many use cases where you are dealing with huge volumes and losing a small portion of records is not critical.
+For example, if you are counting hits on a video, or collecting a twitter feed for sentiment analysis. In such use cases,
+even if you lose 2-3% of your tweets, it may not be a problem.
+But, it is important to understand that in fire and forget approach, you may lose some messages.
+So, don't use this method when you can't afford to lose your messages.
+
+Synchronous Producer
+--------------------
+In this approach, we send a message and wait until we get a response.
+In the case of a success, we get a RecordMetadata object, and in the event of failure, we get an exception.
+Most of the time, we don't care about the success and the RecordMetadata that we receive.
+We only care about exception because we want to log errors for later analysis and appropriate action.
+You can adopt this method if your messages are critical and you can't afford to lose anything.
+But it is important to notice that synchronous approach will slow you down.
+It will limit your throughput because you are waiting for every message to get acknowledged.
+You are sending one message and waiting for success, then you send your next message, and again wait for success.
+Each message will take some time to be delivered over the network.
+So, after every message, you will be waiting for a network delay.
+And the most interesting thing is that, you may not be doing anything in case of success.
+You care only failures, if it fails, you may want to take some action.
+The fire and forget approach was on one extreme, and the synchronous approach is at another extreme.
+I mean, in one approach, you don't care at all, and in another method, you wait for every single message.
+So, there is a third approach which takes the middle path.
+
+Asynchronous Producer
+---------------------
+In this method, we send a message and provide a call back function to receive acknowledgment.
+We don't wait for success and failure. The producer will callback our function with RecordMetadata and an exception object.
+So, if you just care about exceptions, you simply look at the exception, if it is null, don't do anything.
+If the exception is not null, then you know it failed, so you can record the message details for later analysis.
+In this approach, you keep sending messages as fast as you can without waiting for responses,
+and handle failures later as they come using a callback function.
+The asynchronous method appears to provide you a throughput that is as good as fire and forget approach.
+But there is a catch. You have a limit of in-flight messages.
+This limit is controlled by a configuration parameter max.in.flight.requests.per.connection.
+This parameter controls that how many messages you can send to the server without receiving a response. The default value is 5.
+You can increase this value, but there are other considerations.
+Asynchronous send gives you a better throughput compared to synchronous, but the max.in.flight.requests.per.connection limits it.

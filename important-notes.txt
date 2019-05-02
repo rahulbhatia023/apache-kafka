@@ -46,3 +46,14 @@ This limit is controlled by a configuration parameter max.in.flight.requests.per
 This parameter controls that how many messages you can send to the server without receiving a response. The default value is 5.
 You can increase this value, but there are other considerations.
 Asynchronous send gives you a better throughput compared to synchronous, but the max.in.flight.requests.per.connection limits it.
+
+
+Problems with Kafka Custom Serializer/Deserializer
+==================================================
+The problem with this approach is managing future changes in the schema.
+Suppose you implemented this serializer and deserializer, and your system is functional for few months.
+After few months, you have a requirement to add another field in the supplier object.
+If you modify your Supplier object, you must change your serializer and deserializer, may be the producer and consumer as well.
+But the problem doesn't end there.
+After making new changes, you can't read your older messages because you changed the format and modified your code to read the new format.
+That's where generic serializers like Avro will be helpful.

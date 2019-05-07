@@ -103,3 +103,66 @@ retries
 -------
 It defines how many times the producer will retry after getting an error. The default value is 0.
 There is another parameter 'retry.backoff.ms' that controls the time between two retries. The default value for this parameter is 100 milliseconds.
+
+
+Kafka Consumer Groups
+=====================
+
+If your producers are pushing data to the topic at a moderate speed, a single consumer may be enough to read and process that data.
+However, if you want to scale up your system and read data from Kafka in parallel, you need multiple consumers reading your topic in parallel.
+Many applications may have a clear need for multiple producers pushing data to a topic at one end and multiple consumers reading and processing data on the other end.
+There is no complexity at the producer side. It is as simple as executing another instance of a producer.
+There is no coordination or sharing of information needed among producers.
+But on the consumer side, we have various considerations.
+
+When I talk about parallel reading, I am speaking about one single application consuming data in parallel.
+It is not about multiple applications reading same Kafka topic in parallel.
+So, the question is, how to implement parallel reads in a single application.
+We can do that by creating a group and starting multiple consumers in the same group.
+
+If we have multiple consumers reading data in parallel from the same topic, don't you think that all of them can read the same message?
+The answer is no. Only one consumer owns a partition at any point in time.
+
+Let's take an example to understand this.
+We have one topic, and there are four partitions. So, if we have only one consumer in a group, it reads from all four partitions.
+If you have two, each of them reads two partitions.
+If you have three, the arrangement may be something like a single consumer reading two partitions and others own a single partition each.
+So, the fundamental concept is that the consumers do not share a partition. There is no way we can read the same message more than once.
+However, this solution also brings a limitation. The number of partitions on a topic is the upper limit of consumers you can have in a group.
+So, in our example, if you have five consumers, one of them reads nothing.
+Kafka won't complain that you have four partitions, but you are starting five consumers. Simply, the fifth consumer will have nothing to read.
+
+How does a consumer enter and exit into a group?
+-----------------------------------------------
+Question is, how Kafka handles it?
+When a consumer joins a group, how is a partition assigned to it?
+Moreover, what happens to the partition when a consumer leaves the group? Who manages all of this?
+
+Kafka Group Coordinator
+-----------------------
+A group coordinator oversees all of this. So, one of the Kafka broker gets elected as a Group Coordinator.
+When a consumer wants to join a group, it sends a request to the coordinator. The first consumer to participate in a group becomes a leader.
+All other consumers joining later becomes the members of the group.
+So, we have two actors, A coordinator, and a group leader. The coordinator is responsible for managing a list of group members.
+So, every time a new member joins the group, or an existing member leaves the group, the coordinator modifies the list.
+On an event of membership change, the coordinator realizes that it is time to rebalance the partition assignment.
+Because you may have a new member, and you need to assign it some partitions, or a member left, and you need to reassign those partitions to someone else.
+So, every time the list is modified, the coordinator initiates a rebalance activity.
+
+Kafka Group Leader
+------------------
+The group leader is responsible for executing rebalance activity.
+The group leader will take a list of current members, assign partitions to them and send it back to the coordinator.
+The Coordinator then communicates back to the members about their new partitions.
+The important thing to note here is, during the rebalance activity, none of the consumers are allowed to read any message.
+
+
+Kafka Consumer: The Poll Method
+===============================
+The poll function is pretty powerful and takes care of a lot of things.
+It handles all the coordination, partition rebalances, and heart beat for group coordinator.
+When you call to poll for the first time from a consumer, it finds a group coordinator, joins the group, receives partition assignment
+and fetches some records from those partitions.
+Every time you call to poll, it will send a heartbeat to group coordinator.
+So, it is necessary that whatever you do in a consumer, it should be quick and efficient.
+If you don't poll for a while, the coordinator may assume that the consumer is dead and trigger a partition rebalance.

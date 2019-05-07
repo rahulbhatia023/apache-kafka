@@ -166,3 +166,83 @@ and fetches some records from those partitions.
 Every time you call to poll, it will send a heartbeat to group coordinator.
 So, it is necessary that whatever you do in a consumer, it should be quick and efficient.
 If you don't poll for a while, the coordinator may assume that the consumer is dead and trigger a partition rebalance.
+
+
+Offset Management
+=================
+
+The offset is a position within a partition for the next message to be sent to a consumer. Kafka maintains two types of offsets:
+
+Current offset
+Committed offset
+
+Current Offset
+--------------
+When we call a poll method, Kafka sends some messages to us. Let us assume we have 100 records in the partition.
+The initial position of the current offset is 0. We made our first call and received 20 messages. Now Kafka will move the current offset to 20.
+When we make our next request, it will send some more messages starting from 20 and again move the current offset forward.
+The offset is a simple integer number that is used by Kafka to maintain the current position of a consumer.
+The current offset is a pointer to the last record that Kafka has already sent to a consumer in the most recent poll.
+
+Committed Offset
+----------------
+It is the position that a consumer has confirmed about processing. What does that mean?
+After receiving a list of messages, we want to process it. This processing may be just storing them into HDFS.
+Once we are sure that we have successfully processed the record, we may want to commit the offset.
+So, the committed offset is a pointer to the last record that a consumer has successfully processed.
+For example, the consumer received 20 records. It is processing them one by one, and after processing each record, it is committing the offset.
+
+Current offset -> Sent Records -> This is used to avoid resending same records again to the same consumer.
+Committed offset -> Processed Records -> It is used to avoid resending same records to a new consumer in the event of partition rebalance.
+
+The committed offset is critical in the case of partition rebalance.
+In the event of rebalancing. When a new consumer is assigned a new partition, it should ask a question.
+Where to start? What is already processed by the previous owner? The answer to the question is the committed offset.
+
+How to commit an offset?
+-----------------------
+There are two ways to do it.
+
+Auto commit
+Manual commit
+
+Auto Commit
+-----------
+Auto-commit is the easiest method. You can control this feature by setting two properties:
+
+enable.auto.commit
+auto.commit.interval.ms
+
+The first property is by default true. So auto-commit is enabled by default. You can turn it off by setting 'enable.auto.commit' to false.
+The second property defines the interval of auto-commit. The default value for this property is 5 seconds.
+So, in a default configuration, when you make a call to the poll method, it will check if it is time to commit.
+If you have passed five seconds since the previous call, the consumer will commit the last offset.
+So, Kafka will commit your offset every five seconds.
+The auto-commit is a convenient option, but it may cause second processing of records. Let us understand it with an example.
+You have some messages in the partition, and you made your first poll request.
+You received 10 messages hence the consumer increases the current offset to 10.
+You take four seconds to process these ten messages and make a new call. Since you haven't passed five seconds, the consumer will not commit the offset.
+You received another set of records, and for some reason rebalance is triggered at this moment.
+First ten records are already processed, but nothing is committed yet. Right? The rebalance is triggered.
+So, the partition goes to a different consumer.
+Since we don't have a committed offset, the new owner of partition should start reading from the beginning and process first ten records again.
+You might be thinking that let's reduce the commit frequency to four seconds.
+You can lower the incidence of commit by setting the auto-commit interval to a lower value, but you can't guarantee to eliminate repeat processing.
+
+Manual Commit
+-------------
+We can configure the auto-commit off and manually commit after processing the records. There are two approaches to manual commit:
+
+Commit Sync
+Commit Async
+
+Synchronous commit is a straightforward and reliable method, but it is a blocking method.
+It will block your call for completing a commit operation, and it will also retry if there are recoverable errors.
+
+Asynchronous commit will send the request and continue. The drawback is that async commit will not retry.
+Let us assume that you are trying to commit an offset as 75. It failed for some recoverable reason, and you want to retry it after few seconds.
+Since this was an asynchronous call, so without knowing that your previous commit is waiting, you initiated another commit.
+This time it is to commit 100. Your commit 100 is successful while commit-75 waits for a retry.
+What do you want to do? Obviously, you don't want to commit 75 after commit 100. That may cause problems.
+So, they designed asynchronous commit to not to retry.
+However, this behaviour is not an issue because you know that if one commit fails for a recoverable reason, the next higher order commit will succeed.

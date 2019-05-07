@@ -47,6 +47,18 @@ This parameter controls that how many messages you can send to the server withou
 You can increase this value, but there are other considerations.
 Asynchronous send gives you a better throughput compared to synchronous, but the max.in.flight.requests.per.connection limits it.
 
+There is a side effect of asynchronous send. Let's assume you send 10 requests for same partition.
+5 of them were sent as the first batch and failed. Remaining five goes as a second batch and succeed.
+Now the producer will retry the first batch, and if it is successful, you lost your order.
+That's a significant side effect of asynchronous send. So, be careful if the order of delivery is critical for you.
+If you are looking for an ordered delivery of your messages, you have following two options.
+
+Use synchronous send.
+set max.in.flight.requests.per.connection to 1
+
+Both options have the same result. The order is critical for some use cases, especially transactional systems, for example banks and inventory.
+If you are working on that kind of use case, set max.in.flight.requests.per.connection to 1.
+
 
 Problems with Kafka Custom Serializer/Deserializer
 ==================================================
@@ -57,3 +69,37 @@ If you modify your Supplier object, you must change your serializer and deserial
 But the problem doesn't end there.
 After making new changes, you can't read your older messages because you changed the format and modified your code to read the new format.
 That's where generic serializers like Avro will be helpful.
+
+
+Kafka Producer Configs
+======================
+
+acks
+----
+The acks configuration is to configure acknowledgments.
+When producers send a message to Kafka broker, they get a response back from the broker.
+The response is a RecordMetaData object or an exception.
+This parameter acks, it can take three values: 0, 1, and all.
+
+acks=0 : the producer will not wait for the response. It will send the message over the network and forget.
+There are side effects of acks being 0:
+Possible loss of messages
+No Retries
+
+acks=1: the producer will wait for the response. However, the response is sent by the leader.
+In this case, the leader will respond after recording the message in its local storage.
+If the leader is down and message delivery fails, the producer can retry after few milliseconds.
+This option appears to be a safe choice. You still cannot guarantee that you will not lose your message.
+We are not sure that it is replicated.
+If the leader breaks before replica could make a copy, the message will be lost.
+Surprisingly, in such scenario, the messages can be lost even after successful acknowledgment.
+If you want to achieve 100% reliability, it is necessary that all replicas in the ISR list should make a copy successfully
+before the leader sends an acknowledgment.
+
+acks=all: If we set acks parameter to all, the leader will acknowledge only after it receives an acknowledgment from all of the live replicas.
+This option gives you the highest reliability but costs you the highest latency.
+
+retries
+-------
+It defines how many times the producer will retry after getting an error. The default value is 0.
+There is another parameter 'retry.backoff.ms' that controls the time between two retries. The default value for this parameter is 100 milliseconds.

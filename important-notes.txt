@@ -265,7 +265,7 @@ Your current partitions will be taken away from you and reassigned to some other
 In such cases, you would want to commit whatever you have already processed before the ownership of the partition is taken away from you.
 And the new owner of the partition is supposed to start consuming it from the last committed offset.
 
-Kafka API allows us to specify a ConsumerRebalanceListener class. This class offers two methods.
+Kafka API allows us to specify a ConsumerRebalanceListener class. This class offers two methods:
 
 onPartitionsRevoked() - The Kafka will call the onPartitionsRevoked method just before it takes away your partitions.
 So, this is where you can commit your current offset.

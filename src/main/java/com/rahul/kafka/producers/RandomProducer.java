@@ -19,7 +19,7 @@ public class RandomProducer {
         configProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         configProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
-        KafkaProducer<String, String> producer = new KafkaProducer<>(configProperties);
+        KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(configProperties);
 
         Random random = new Random();
         Calendar calendar = Calendar.getInstance();
@@ -27,8 +27,8 @@ public class RandomProducer {
 
         /*
         The topic is already created and it has two partitions.
-        If you look at those two send method calls, you will notice that we are sending the first message to partition zero
-        and then next message to partition one.
+        If you look at those two send method calls, you will notice that we are sending the first message to partition 0
+        and then next message to partition 1.
         I am making these calls in an infinite loop, so the producer will keep sending data to both the partitions.
         This flow of continuous messages to both the partitions will help us simulate a rebalance and understand the behaviour of consumers.
          */
@@ -40,14 +40,14 @@ public class RandomProducer {
                             calendar.get(Calendar.DATE) + "," +
                             random.nextInt(1000);
 
-                    producer.send(new ProducerRecord<>(IKafkaConstants.TOPIC_NAME, 0, "Key", message)).get();
+                    kafkaProducer.send(new ProducerRecord<>(IKafkaConstants.TOPIC_NAME, 0, "Key", message)).get();
 
                     message = calendar.get(Calendar.YEAR) + "-" +
                             calendar.get(Calendar.MONTH) + "-" +
                             calendar.get(Calendar.DATE) + "," +
                             random.nextInt(1000);
 
-                    producer.send(new ProducerRecord<>(IKafkaConstants.TOPIC_NAME, 1, "Key", message)).get();
+                    kafkaProducer.send(new ProducerRecord<>(IKafkaConstants.TOPIC_NAME, 1, "Key", message)).get();
                 }
                 calendar.add(Calendar.DATE, 1);
                 System.out.println("Data Sent for " +
@@ -58,7 +58,7 @@ public class RandomProducer {
         } catch (Exception ex) {
             System.out.println("Interrupted");
         } finally {
-            producer.close();
+            kafkaProducer.close();
         }
     }
 }

@@ -246,3 +246,29 @@ This time it is to commit 100. Your commit 100 is successful while commit-75 wai
 What do you want to do? Obviously, you don't want to commit 75 after commit 100. That may cause problems.
 So, they designed asynchronous commit to not to retry.
 However, this behaviour is not an issue because you know that if one commit fails for a recoverable reason, the next higher order commit will succeed.
+
+
+Rebalance Listener
+==================
+Suppose, we have a situation where we got a lot of data using the poll method, and it is going to take some reasonable time to complete the processing for all the records.
+If you are taking a lot of time to process your records, you will have two types of risks:
+
+1. The first risk is the delay in next poll, because you are busy processing data from the last call.
+   If you don't poll for a long, the group coordinator might assume that you are dead and trigger a rebalance activity.
+   You don't want that to happen, Right? Because you were not dead, you were computing.
+
+2. The second risk is also related to rebalancing.
+   The coordinator triggers a rebalance activity for some other reason while you are processing an extensive list of messages.
+
+In both the cases, rebalance is triggered either because you didn't poll for a while or something else went wrong.
+Your current partitions will be taken away from you and reassigned to some other consumer.
+In such cases, you would want to commit whatever you have already processed before the ownership of the partition is taken away from you.
+And the new owner of the partition is supposed to start consuming it from the last committed offset.
+
+Kafka API allows us to specify a ConsumerRebalanceListener class. This class offers two methods.
+
+onPartitionsRevoked() - The Kafka will call the onPartitionsRevoked method just before it takes away your partitions.
+So, this is where you can commit your current offset.
+
+onPartitionsAssigned() - The Kafka will call the onPartitionsAssigned method right after the rebalancing is complete and
+before you start consuming records from the new partitions.

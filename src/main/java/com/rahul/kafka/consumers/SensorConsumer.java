@@ -72,11 +72,11 @@ public class SensorConsumer {
     private static long getOffsetFromDB(TopicPartition topicPartition) {
         long offset = 0;
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "pandey");
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/testdb", "root", "root");
 
             String sql = "select offset from tss_offsets where topic_name='"
-                    + topicPartition.topic() + "' and partition=" + topicPartition.partition();
+                    + topicPartition.topic() + "' and topic_partition=" + topicPartition.partition();
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(sql);
             if (resultSet.next())
@@ -85,6 +85,7 @@ public class SensorConsumer {
             connection.close();
         } catch (Exception e) {
             System.out.println("Exception in getOffsetFromDB");
+            e.printStackTrace();
         }
         return offset;
     }
@@ -96,8 +97,8 @@ public class SensorConsumer {
         System.out.println("Topic=" + consumerRecord.topic() + " Partition=" + consumerRecord.partition() + " Offset=" + consumerRecord.offset()
                 + " Key=" + consumerRecord.key() + " Value=" + consumerRecord.value());
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "pandey");
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/testdb", "root", "root");
 
             /*
             We set auto commit false, insert data, update offset, and finally, execute commit.

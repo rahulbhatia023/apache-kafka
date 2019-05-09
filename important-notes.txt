@@ -329,3 +329,11 @@ So, I will create a consumer that will assign three TSS partitions to itself.
 Then, it will start reading all messages from those three partitions and insert each message into a database table.
 It will not commit the offset back to Kafka. Instead, it will update the current offset into another database table.
 The insert and update statements will be part of a single transaction, so either both will complete, or both will fail.
+
+    create database test;
+    use test;
+    create table tss_data(skey varchar(50), svalue varchar(50));
+    create table tss_offsets(topic_name varchar(50),topic_partition int, offset int);
+    insert into tss_offsets values('SensorTopic1',0,0);
+    insert into tss_offsets values('SensorTopic1',1,0);
+    insert into tss_offsets values('SensorTopic1',2,0);

@@ -272,3 +272,60 @@ So, this is where you can commit your current offset.
 
 onPartitionsAssigned() - The Kafka will call the onPartitionsAssigned method right after the rebalancing is complete and
 before you start consuming records from the new partitions.
+
+
+Problems with Kafka Consumer Groups
+===================================
+
+Automatic group management & Partition assignment
+-------------------------------------------------
+You remember, we used a custom partitioner to make sure that all the data for TSS sensor will land into first three partitions.
+You have that system in place for collecting data. Now you have a real-time statistics calculation requirement for TSS sensor.
+So, you need to create a consumer that reads only TSS data and calculates required statistics.
+
+One way is that you read all the data and discard everything else except TSS and then calculate your stats.
+But you don't want to do unnecessary work.
+
+You might be thinking that you should have created a separate topic for TSS. Then, it was easy. Right?
+You can subscribe to TSS topic and rest is simple. But this system was designed in this way for a reason, and now you don't have a luxury of redesigning.
+
+You can find a solution easily if you have the flexibility to create a consumer and assign these three partitions to yourself. That's it.
+Your Consumer will read these three partitions and rest will be simple.
+I think this example makes a point that in certain use cases, you may need the flexibility to take control of the partition assignment
+instead of relying on Kafka to do a random assignment.
+
+Offset and consumer positions control
+-------------------------------------
+We already know that Kafka maintains a current offset and a committed offset for each consumer.
+We have also seen an example for rebalance listener where we take partial control over the offset.
+I am not sure if you already noticed that we still have a problem in that implementation.
+
+                // Code from random consumer example
+                while (true) {
+                    ConsumerRecords<String, String> consumerRecords = kafkaConsumer.poll(Duration.ofSeconds(100));
+                    for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
+                        // Do some processing and save it to Database
+                        rebalanceListener.addOffset(consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
+                    }
+                }
+
+Just look at the for-loop. First step is to process the record and save the result in the database.
+Then in the next step, we keep the offset because we finished processing that message, and we will commit the offset later.
+But those two steps are two operations, and they are not atomic.
+It is possible that we save the record in the database and the consumer crashes before committing the offset.
+So, the rebalance listener will allow us to perform clean up and commit before the partition goes away,
+but it can't help us in synching the processed record and committed offset.
+There is no other way to achieve it except making SaveToDatabase and commit offset as a single atomic transaction.
+
+Great, now we understand that we may have use cases where we need to take full control of two things:
+
+1.  Partition assignment - That means, we don't want Kafka to assign partitions to different consumers.
+    We want to take the control and assign desired partitions to ourselves.
+
+2.  Committed offset management - That means, we don't want Kafka to store the offset.
+    We want to maintain the committed offset somewhere outside of Kafka. This approach allows us to develop transactional systems.
+
+So, I will create a consumer that will assign three TSS partitions to itself.
+Then, it will start reading all messages from those three partitions and insert each message into a database table.
+It will not commit the offset back to Kafka. Instead, it will update the current offset into another database table.
+The insert and update statements will be part of a single transaction, so either both will complete, or both will fail.

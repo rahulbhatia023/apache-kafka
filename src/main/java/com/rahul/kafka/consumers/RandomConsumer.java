@@ -29,7 +29,7 @@ public class RandomConsumer {
             while (true) {
                 ConsumerRecords<String, String> consumerRecords = kafkaConsumer.poll(Duration.ofSeconds(100));
                 for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
-                    // Do some processing
+                    // Do some processing and save it to database
                     rebalanceListener.addOffset(consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
                 }
             }

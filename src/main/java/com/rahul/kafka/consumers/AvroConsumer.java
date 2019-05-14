@@ -36,6 +36,7 @@ public class AvroConsumer {
                 for (ConsumerRecord<String, ClickRecord> consumerRecord : consumerRecords) {
                     System.out.println("Session id=" + consumerRecord.value().getSessionId()
                             + " Channel=" + consumerRecord.value().getChannel()
+                            + " Ip=" + consumerRecord.value().getIp()
                             + " Referrer=" + consumerRecord.value().getReferrer());
                 }
             }

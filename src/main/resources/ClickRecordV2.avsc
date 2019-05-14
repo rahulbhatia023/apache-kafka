@@ -1,4 +1,4 @@
-{ "type": "record",
+{"type": "record",
         "name": "ClickRecord",
         "namespace": "com.rahul.kafka.pojo",
         "fields": [
@@ -6,7 +6,9 @@
             {"name": "browser", "type": ["string", "null"]},
             {"name": "campaign", "type": ["string", "null"]},
             {"name": "channel", "type": "string"},
-            {"name": "referrer", "type": ["string", "null"], "default": "None"},
-            {"name": "ip", "type": ["string", "null"]}
+            {"name": "entry_url", "type": ["string", "null"], "default": "None"},
+            {"name": "ip", "type": ["string", "null"]},
+            {"name": "language", "type": ["string", "null"], "default": "None"},
+            {"name": "os", "type": ["string", "null"],"default": "None"}
         ]
-}
+    }

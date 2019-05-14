@@ -25,6 +25,9 @@ public class AvroProducer {
         clickRecord.setSessionId("10001");
         clickRecord.setChannel("HomePage");
         clickRecord.setIp("192.168.0.1");
+        clickRecord.setLanguage("Spanish");
+        clickRecord.setOs("Mac");
+        clickRecord.setEntryUrl("http://facebook.com/myadd");
 
         try {
             kafkaProducer.send(new ProducerRecord<>(topicName, clickRecord.getSessionId().toString(), clickRecord)).get();

@@ -13,8 +13,8 @@ import org.apache.avro.message.SchemaStore;
 @SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class ClickRecord extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = 4620689148730762730L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"ClickRecord\",\"namespace\":\"com.rahul.kafka.pojo\",\"fields\":[{\"name\":\"session_id\",\"type\":\"string\"},{\"name\":\"browser\",\"type\":[\"string\",\"null\"]},{\"name\":\"campaign\",\"type\":[\"string\",\"null\"]},{\"name\":\"channel\",\"type\":\"string\"},{\"name\":\"referrer\",\"type\":[\"string\",\"null\"],\"default\":\"None\"},{\"name\":\"ip\",\"type\":[\"string\",\"null\"]}]}");
+  private static final long serialVersionUID = -2490416422094811999L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"ClickRecord\",\"namespace\":\"com.rahul.kafka.pojo\",\"fields\":[{\"name\":\"session_id\",\"type\":\"string\"},{\"name\":\"browser\",\"type\":[\"string\",\"null\"]},{\"name\":\"campaign\",\"type\":[\"string\",\"null\"]},{\"name\":\"channel\",\"type\":\"string\"},{\"name\":\"entry_url\",\"type\":[\"string\",\"null\"],\"default\":\"None\"},{\"name\":\"ip\",\"type\":[\"string\",\"null\"]},{\"name\":\"language\",\"type\":[\"string\",\"null\"],\"default\":\"None\"},{\"name\":\"os\",\"type\":[\"string\",\"null\"],\"default\":\"None\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static SpecificData MODEL$ = new SpecificData();
@@ -55,8 +55,10 @@ public class ClickRecord extends org.apache.avro.specific.SpecificRecordBase imp
   @Deprecated public CharSequence browser;
   @Deprecated public CharSequence campaign;
   @Deprecated public CharSequence channel;
-  @Deprecated public CharSequence referrer;
+  @Deprecated public CharSequence entry_url;
   @Deprecated public CharSequence ip;
+  @Deprecated public CharSequence language;
+  @Deprecated public CharSequence os;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -71,16 +73,20 @@ public class ClickRecord extends org.apache.avro.specific.SpecificRecordBase imp
    * @param browser The new value for browser
    * @param campaign The new value for campaign
    * @param channel The new value for channel
-   * @param referrer The new value for referrer
+   * @param entry_url The new value for entry_url
    * @param ip The new value for ip
+   * @param language The new value for language
+   * @param os The new value for os
    */
-  public ClickRecord(CharSequence session_id, CharSequence browser, CharSequence campaign, CharSequence channel, CharSequence referrer, CharSequence ip) {
+  public ClickRecord(CharSequence session_id, CharSequence browser, CharSequence campaign, CharSequence channel, CharSequence entry_url, CharSequence ip, CharSequence language, CharSequence os) {
     this.session_id = session_id;
     this.browser = browser;
     this.campaign = campaign;
     this.channel = channel;
-    this.referrer = referrer;
+    this.entry_url = entry_url;
     this.ip = ip;
+    this.language = language;
+    this.os = os;
   }
 
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
@@ -91,8 +97,10 @@ public class ClickRecord extends org.apache.avro.specific.SpecificRecordBase imp
     case 1: return browser;
     case 2: return campaign;
     case 3: return channel;
-    case 4: return referrer;
+    case 4: return entry_url;
     case 5: return ip;
+    case 6: return language;
+    case 7: return os;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -105,8 +113,10 @@ public class ClickRecord extends org.apache.avro.specific.SpecificRecordBase imp
     case 1: browser = (CharSequence)value$; break;
     case 2: campaign = (CharSequence)value$; break;
     case 3: channel = (CharSequence)value$; break;
-    case 4: referrer = (CharSequence)value$; break;
+    case 4: entry_url = (CharSequence)value$; break;
     case 5: ip = (CharSequence)value$; break;
+    case 6: language = (CharSequence)value$; break;
+    case 7: os = (CharSequence)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -176,19 +186,19 @@ public class ClickRecord extends org.apache.avro.specific.SpecificRecordBase imp
   }
 
   /**
-   * Gets the value of the 'referrer' field.
-   * @return The value of the 'referrer' field.
+   * Gets the value of the 'entry_url' field.
+   * @return The value of the 'entry_url' field.
    */
-  public CharSequence getReferrer() {
-    return referrer;
+  public CharSequence getEntryUrl() {
+    return entry_url;
   }
 
   /**
-   * Sets the value of the 'referrer' field.
+   * Sets the value of the 'entry_url' field.
    * @param value the value to set.
    */
-  public void setReferrer(CharSequence value) {
-    this.referrer = value;
+  public void setEntryUrl(CharSequence value) {
+    this.entry_url = value;
   }
 
   /**
@@ -205,6 +215,38 @@ public class ClickRecord extends org.apache.avro.specific.SpecificRecordBase imp
    */
   public void setIp(CharSequence value) {
     this.ip = value;
+  }
+
+  /**
+   * Gets the value of the 'language' field.
+   * @return The value of the 'language' field.
+   */
+  public CharSequence getLanguage() {
+    return language;
+  }
+
+  /**
+   * Sets the value of the 'language' field.
+   * @param value the value to set.
+   */
+  public void setLanguage(CharSequence value) {
+    this.language = value;
+  }
+
+  /**
+   * Gets the value of the 'os' field.
+   * @return The value of the 'os' field.
+   */
+  public CharSequence getOs() {
+    return os;
+  }
+
+  /**
+   * Sets the value of the 'os' field.
+   * @param value the value to set.
+   */
+  public void setOs(CharSequence value) {
+    this.os = value;
   }
 
   /**
@@ -243,8 +285,10 @@ public class ClickRecord extends org.apache.avro.specific.SpecificRecordBase imp
     private CharSequence browser;
     private CharSequence campaign;
     private CharSequence channel;
-    private CharSequence referrer;
+    private CharSequence entry_url;
     private CharSequence ip;
+    private CharSequence language;
+    private CharSequence os;
 
     /** Creates a new Builder */
     private Builder() {
@@ -273,13 +317,21 @@ public class ClickRecord extends org.apache.avro.specific.SpecificRecordBase imp
         this.channel = data().deepCopy(fields()[3].schema(), other.channel);
         fieldSetFlags()[3] = true;
       }
-      if (isValidValue(fields()[4], other.referrer)) {
-        this.referrer = data().deepCopy(fields()[4].schema(), other.referrer);
+      if (isValidValue(fields()[4], other.entry_url)) {
+        this.entry_url = data().deepCopy(fields()[4].schema(), other.entry_url);
         fieldSetFlags()[4] = true;
       }
       if (isValidValue(fields()[5], other.ip)) {
         this.ip = data().deepCopy(fields()[5].schema(), other.ip);
         fieldSetFlags()[5] = true;
+      }
+      if (isValidValue(fields()[6], other.language)) {
+        this.language = data().deepCopy(fields()[6].schema(), other.language);
+        fieldSetFlags()[6] = true;
+      }
+      if (isValidValue(fields()[7], other.os)) {
+        this.os = data().deepCopy(fields()[7].schema(), other.os);
+        fieldSetFlags()[7] = true;
       }
     }
 
@@ -305,13 +357,21 @@ public class ClickRecord extends org.apache.avro.specific.SpecificRecordBase imp
         this.channel = data().deepCopy(fields()[3].schema(), other.channel);
         fieldSetFlags()[3] = true;
       }
-      if (isValidValue(fields()[4], other.referrer)) {
-        this.referrer = data().deepCopy(fields()[4].schema(), other.referrer);
+      if (isValidValue(fields()[4], other.entry_url)) {
+        this.entry_url = data().deepCopy(fields()[4].schema(), other.entry_url);
         fieldSetFlags()[4] = true;
       }
       if (isValidValue(fields()[5], other.ip)) {
         this.ip = data().deepCopy(fields()[5].schema(), other.ip);
         fieldSetFlags()[5] = true;
+      }
+      if (isValidValue(fields()[6], other.language)) {
+        this.language = data().deepCopy(fields()[6].schema(), other.language);
+        fieldSetFlags()[6] = true;
+      }
+      if (isValidValue(fields()[7], other.os)) {
+        this.os = data().deepCopy(fields()[7].schema(), other.os);
+        fieldSetFlags()[7] = true;
       }
     }
 
@@ -472,40 +532,40 @@ public class ClickRecord extends org.apache.avro.specific.SpecificRecordBase imp
     }
 
     /**
-      * Gets the value of the 'referrer' field.
+      * Gets the value of the 'entry_url' field.
       * @return The value.
       */
-    public CharSequence getReferrer() {
-      return referrer;
+    public CharSequence getEntryUrl() {
+      return entry_url;
     }
 
     /**
-      * Sets the value of the 'referrer' field.
-      * @param value The value of 'referrer'.
+      * Sets the value of the 'entry_url' field.
+      * @param value The value of 'entry_url'.
       * @return This builder.
       */
-    public Builder setReferrer(CharSequence value) {
+    public Builder setEntryUrl(CharSequence value) {
       validate(fields()[4], value);
-      this.referrer = value;
+      this.entry_url = value;
       fieldSetFlags()[4] = true;
       return this;
     }
 
     /**
-      * Checks whether the 'referrer' field has been set.
-      * @return True if the 'referrer' field has been set, false otherwise.
+      * Checks whether the 'entry_url' field has been set.
+      * @return True if the 'entry_url' field has been set, false otherwise.
       */
-    public boolean hasReferrer() {
+    public boolean hasEntryUrl() {
       return fieldSetFlags()[4];
     }
 
 
     /**
-      * Clears the value of the 'referrer' field.
+      * Clears the value of the 'entry_url' field.
       * @return This builder.
       */
-    public Builder clearReferrer() {
-      referrer = null;
+    public Builder clearEntryUrl() {
+      entry_url = null;
       fieldSetFlags()[4] = false;
       return this;
     }
@@ -549,6 +609,84 @@ public class ClickRecord extends org.apache.avro.specific.SpecificRecordBase imp
       return this;
     }
 
+    /**
+      * Gets the value of the 'language' field.
+      * @return The value.
+      */
+    public CharSequence getLanguage() {
+      return language;
+    }
+
+    /**
+      * Sets the value of the 'language' field.
+      * @param value The value of 'language'.
+      * @return This builder.
+      */
+    public Builder setLanguage(CharSequence value) {
+      validate(fields()[6], value);
+      this.language = value;
+      fieldSetFlags()[6] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'language' field has been set.
+      * @return True if the 'language' field has been set, false otherwise.
+      */
+    public boolean hasLanguage() {
+      return fieldSetFlags()[6];
+    }
+
+
+    /**
+      * Clears the value of the 'language' field.
+      * @return This builder.
+      */
+    public Builder clearLanguage() {
+      language = null;
+      fieldSetFlags()[6] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'os' field.
+      * @return The value.
+      */
+    public CharSequence getOs() {
+      return os;
+    }
+
+    /**
+      * Sets the value of the 'os' field.
+      * @param value The value of 'os'.
+      * @return This builder.
+      */
+    public Builder setOs(CharSequence value) {
+      validate(fields()[7], value);
+      this.os = value;
+      fieldSetFlags()[7] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'os' field has been set.
+      * @return True if the 'os' field has been set, false otherwise.
+      */
+    public boolean hasOs() {
+      return fieldSetFlags()[7];
+    }
+
+
+    /**
+      * Clears the value of the 'os' field.
+      * @return This builder.
+      */
+    public Builder clearOs() {
+      os = null;
+      fieldSetFlags()[7] = false;
+      return this;
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public ClickRecord build() {
@@ -558,8 +696,10 @@ public class ClickRecord extends org.apache.avro.specific.SpecificRecordBase imp
         record.browser = fieldSetFlags()[1] ? this.browser : (CharSequence) defaultValue(fields()[1]);
         record.campaign = fieldSetFlags()[2] ? this.campaign : (CharSequence) defaultValue(fields()[2]);
         record.channel = fieldSetFlags()[3] ? this.channel : (CharSequence) defaultValue(fields()[3]);
-        record.referrer = fieldSetFlags()[4] ? this.referrer : (CharSequence) defaultValue(fields()[4]);
+        record.entry_url = fieldSetFlags()[4] ? this.entry_url : (CharSequence) defaultValue(fields()[4]);
         record.ip = fieldSetFlags()[5] ? this.ip : (CharSequence) defaultValue(fields()[5]);
+        record.language = fieldSetFlags()[6] ? this.language : (CharSequence) defaultValue(fields()[6]);
+        record.os = fieldSetFlags()[7] ? this.os : (CharSequence) defaultValue(fields()[7]);
         return record;
       } catch (Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);

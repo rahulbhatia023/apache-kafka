@@ -37,7 +37,8 @@ public class AvroConsumer {
                     System.out.println("Session id=" + consumerRecord.value().getSessionId()
                             + " Channel=" + consumerRecord.value().getChannel()
                             + " Ip=" + consumerRecord.value().getIp()
-                            + " Referrer=" + consumerRecord.value().getReferrer());
+                            //+ " Referrer=" + consumerRecord.value().getReferrer()
+                    );
                 }
             }
         } catch (Exception ex) {
